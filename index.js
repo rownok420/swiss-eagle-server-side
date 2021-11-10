@@ -22,6 +22,7 @@ async function run() {
         await client.connect();
         const database = client.db("swiss_eagle");
         const productCollections = database.collection("products");
+        const ordersCollection = database.collection("orders");
         
         //  GET SERVICE API
         app.get("/addProduct", async (req, res) => {
@@ -30,10 +31,28 @@ async function run() {
             res.send(product);
         });
 
+        // GET SINGLE ORDER DATA
+        app.get("/placeOrder/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productCollections.findOne(query);
+            res.json(result);
+        });
+
         // POST PRODUCT API
         app.post("/addProduct", async (req, res) => {
             const newProduct = req.body;
             const result = await productCollections.insertOne(newProduct);
+            console.log(
+                `A document was inserted with the _id: ${result.insertedId}`
+            );
+            res.json(result);
+        });
+
+        // POST PLACE ORDER API
+        app.post("/placeOrder", async (req, res) => {
+            const order = req.body;
+            const result = await ordersCollection.insertOne(order);
             console.log(
                 `A document was inserted with the _id: ${result.insertedId}`
             );
