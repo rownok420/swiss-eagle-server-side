@@ -112,6 +112,18 @@ async function run() {
             res.json(result);
         });
 
+        // GET ADMIN
+        app.get("/users/:email", async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await usersCollections.findOne(query);
+            let isAdmin = false;
+            if (user?.role === "admin") {
+                isAdmin = true;
+            }
+            res.json({ admin: isAdmin });
+        });
+
         // SAVE USER IN DATABASE
         app.post("/users", async (req, res) => {
             const users = req.body;
@@ -139,7 +151,7 @@ async function run() {
             const filter = { email: user.email };
             const updateDoc = { $set: { role: "admin" } };
             const result = await usersCollections.updateOne(filter, updateDoc);
-            console.log("admin")
+            console.log("admin");
             res.json(result);
         });
 
