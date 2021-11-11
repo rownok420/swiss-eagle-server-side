@@ -25,7 +25,7 @@ async function run() {
         const ordersCollection = database.collection("orders");
         
         //  GET SERVICE API
-        app.get("/addProduct", async (req, res) => {
+        app.get("/getProduct", async (req, res) => {
             const cursor = productCollections.find({});
             const product = await cursor.toArray();
             res.send(product);
@@ -59,6 +59,14 @@ async function run() {
             res.json(result);
         });
 
+        // DELETE PRODUCT FROM MANAGE ORDERS
+        app.delete("/deleteProduct/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productCollections.deleteOne(query);
+            console.log("deleting products", result);
+            res.json(result);
+        });
 
 
         console.log("Database connect");
