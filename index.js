@@ -23,6 +23,7 @@ async function run() {
         const database = client.db("swiss_eagle");
         const productCollections = database.collection("products");
         const ordersCollection = database.collection("orders");
+        const usersCollections = database.collection("users");
 
         //  GET SERVICE API
         app.get("/getProduct", async (req, res) => {
@@ -108,6 +109,37 @@ async function run() {
                 options
             );
             console.log("updated product", id);
+            res.json(result);
+        });
+
+        // SAVE USER IN DATABASE
+        app.post("/users", async (req, res) => {
+            const users = req.body;
+            const result = await usersCollections.insertOne(users);
+            console.log(result);
+            res.json(result);
+        });
+
+        app.put("/users", async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const options = { upsert: true };
+            const updateDoc = { $set: user };
+            const result = await usersCollections.updateOne(
+                filter,
+                updateDoc,
+                options
+            );
+            res.json(result);
+        });
+
+        // ADD ADMIN ROLE
+        app.put("/users/admin", async (req, res) => {
+            const user = req.body;
+            const filter = { email: user.email };
+            const updateDoc = { $set: { role: "admin" } };
+            const result = await usersCollections.updateOne(filter, updateDoc);
+            console.log("admin")
             res.json(result);
         });
 
