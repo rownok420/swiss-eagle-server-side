@@ -23,7 +23,7 @@ async function run() {
         const database = client.db("swiss_eagle");
         const productCollections = database.collection("products");
         const ordersCollection = database.collection("orders");
-        
+
         //  GET SERVICE API
         app.get("/getProduct", async (req, res) => {
             const cursor = productCollections.find({});
@@ -39,12 +39,19 @@ async function run() {
             res.json(result);
         });
 
-         // FILTER ORDER DATA WITH EMAIL
-         app.get("/myOrder/:email", async (req, res) => {
+        // FILTER ORDER DATA WITH EMAIL
+        app.get("/myOrder/:email", async (req, res) => {
             const result = await ordersCollection
                 .find({ email: req.params.email })
                 .toArray();
             res.json(result);
+        });
+
+        // GET ALL ORDER API
+        app.get("/allOrders", async (req, res) => {
+            const cursor = ordersCollection.find({});
+            const orders = await cursor.toArray();
+            res.json(orders);
         });
 
         // POST PRODUCT API
@@ -85,6 +92,24 @@ async function run() {
             res.json(result);
         });
 
+        // UPDATE ORDER STATUS
+        app.put("/allOrders/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    status: "Shipped",
+                },
+            };
+            const result = await ordersCollection.updateOne(
+                filter,
+                updateDoc,
+                options
+            );
+            console.log("updated product", id);
+            res.json(result);
+        });
 
         console.log("Database connect");
     } finally {
