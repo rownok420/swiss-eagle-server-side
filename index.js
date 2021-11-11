@@ -39,6 +39,14 @@ async function run() {
             res.json(result);
         });
 
+         // FILTER ORDER DATA WITH EMAIL
+         app.get("/myOrder/:email", async (req, res) => {
+            const result = await ordersCollection
+                .find({ email: req.params.email })
+                .toArray();
+            res.json(result);
+        });
+
         // POST PRODUCT API
         app.post("/addProduct", async (req, res) => {
             const newProduct = req.body;
@@ -56,6 +64,15 @@ async function run() {
             console.log(
                 `A document was inserted with the _id: ${result.insertedId}`
             );
+            res.json(result);
+        });
+
+        // DELETE PRODUCT FROM MANAGE ORDERS
+        app.delete("/deleteOrder/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await ordersCollection.deleteOne(query);
+            console.log("deleting products", result);
             res.json(result);
         });
 
