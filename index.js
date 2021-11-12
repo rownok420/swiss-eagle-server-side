@@ -24,12 +24,20 @@ async function run() {
         const productCollections = database.collection("products");
         const ordersCollection = database.collection("orders");
         const usersCollections = database.collection("users");
+        const reviewCollections = database.collection("review");
 
         //  GET SERVICE API
         app.get("/getProduct", async (req, res) => {
             const cursor = productCollections.find({});
             const product = await cursor.toArray();
             res.send(product);
+        });
+
+        // GET REVIEW
+        app.get("/getReview", async (req, res) => {
+            const cursor = reviewCollections.find({});
+            const review = await cursor.toArray();
+            res.send(review);
         });
 
         // GET SINGLE ORDER DATA
@@ -53,6 +61,16 @@ async function run() {
             const cursor = ordersCollection.find({});
             const orders = await cursor.toArray();
             res.json(orders);
+        });
+
+        // POST REVIEW API
+        app.post("/review", async (req, res) => {
+            const newProduct = req.body;
+            const result = await reviewCollections.insertOne(newProduct);
+            console.log(
+                `A document was inserted with the _id: ${result.insertedId}`
+            );
+            res.json(result);
         });
 
         // POST PRODUCT API
@@ -151,7 +169,6 @@ async function run() {
             const filter = { email: user.email };
             const updateDoc = { $set: { role: "admin" } };
             const result = await usersCollections.updateOne(filter, updateDoc);
-            console.log("admin");
             res.json(result);
         });
 
