@@ -26,11 +26,30 @@ async function run() {
         const usersCollections = database.collection("users");
         const reviewCollections = database.collection("review");
 
+        // GET ALL USER
+        app.get("/users", async (req, res) => {
+            const cursor = usersCollections.find({});
+            const users = await cursor.toArray();
+            res.send(users);
+        });
+
         //  GET SERVICE API
         app.get("/getProduct", async (req, res) => {
-            const cursor = productCollections.find({});
-            const product = await cursor.toArray();
-            res.send(product);
+            const limit = +req.query.limit;
+            let result;
+            if (limit) {
+                result = await productCollections
+                    .find({})
+                    .sort({ _id: -1 })
+                    .limit(limit)
+                    .toArray();
+            } else {
+                result = await productCollections
+                    .find({})
+                    .sort({ _id: -1 })
+                    .toArray();
+            }
+            res.json(result);
         });
 
         // GET REVIEW
